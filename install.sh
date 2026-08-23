@@ -1,10 +1,10 @@
 #!/bin/sh
 set -e
 
-echo "Installing stex..."
+echo "Installing neo"
 # Ensure gcc and make exist
 if ! command -v gcc >/dev/null 2>&1; then
-    echo "Error: gcc is required to build stex."
+    echo "Error: gcc is required to build neo."
     exit 1
 fi
 
