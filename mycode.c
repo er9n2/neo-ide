@@ -142,6 +142,7 @@ int keyRead() {
 }
 
 void exitRawMode() {
+  write(STDOUT_FILENO, "\x1b[0 q", 5);
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.original_termios);
 }
 
@@ -448,28 +449,28 @@ void editorKeyPress() {
       break;
 
     /* Marks & Clipboard System */
-    case CTRL_KEY('s'): // Set mark (Changed from Ctrl+M to avoid conflict with Enter)
+    case CTRL_KEY('s'):
       E.markX = E.cx;
       E.markY = E.cy;
       E.hasMark = 1;
       break;
 
-    case CTRL_KEY('g'): // Jump to mark
+    case CTRL_KEY('g'):
       if (E.hasMark && E.markY < E.numRows) {
         E.cy = E.markY;
         E.cx = E.markX;
       }
       break;
 
-    case CTRL_KEY('c'): // Copy region between mark and cursor
+    case CTRL_KEY('c'):
       editorCopy();
       break;
 
-    case CTRL_KEY('k'): // Cut region between mark and cursor
+    case CTRL_KEY('k'):
       editorCut();
       break;
 
-    case CTRL_KEY('v'): // Paste from clipboard
+    case CTRL_KEY('v'):
       editorPaste();
       break;
 
@@ -508,7 +509,7 @@ void editorKeyPress() {
       editorDelChar();
       break;
 
-    case '\r': // Enter Key
+    case '\r':
       editorInsertNewLine();
       break;
 
@@ -533,7 +534,7 @@ void verticalScroll() {
 }
 
 void editorDrawRows(struct abuf *ab) {
-  int margin_width = 6;
+  int margin_width = 7;
 
   for (int y = 0; y < E.screenrows; y++) {
     int filerow = y + E.rowOffset;
@@ -574,10 +575,12 @@ void editorRefreshScreen() {
   abAppend(&ab, "\x1b[?25l", 6);
   abAppend(&ab, "\x1b[H", 3);
 
+  abAppend(&ab, "\x1b[2 q", 5);
+
   editorDrawRows(&ab);
 
   char buf[32];
-  int margin_offset = 7;
+  int margin_offset = 8;
   snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowOffset) + 1, E.cx + margin_offset);
   abAppend(&ab, buf, strlen(buf));
 
