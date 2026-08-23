@@ -1,4 +1,4 @@
-
+To Use do neo filename.txt .py .c anything
 
 Installation 
 
